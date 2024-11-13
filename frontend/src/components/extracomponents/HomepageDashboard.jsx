@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import SideBar from "./SideBar";
 import { NavLink } from "react-router-dom";
 import GovernmentPolicies from "../GovernmentPolicies";
+import { fetchTransactions } from "../../api";  // Import the fetchTransactions function
 
 const HomepageDashboard = () => {
   const [transactions, setTransactions] = useState([]);
@@ -9,15 +10,10 @@ const HomepageDashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const loadTransactions = async () => {
       try {
-        const response = await fetch("/api/get-transactions");
-        if (response.status === 200) {
-          const data = await response.json();
-          setTransactions(data.data);
-        } else {
-          throw new Error("Failed to fetch transactions");
-        }
+        const res = await fetchTransactions();  // Use the imported function
+        setTransactions(res.data);  // Assuming the response contains a "data" field with the transactions
       } catch (error) {
         setError(error.message);
       } finally {
@@ -25,7 +21,7 @@ const HomepageDashboard = () => {
       }
     };
 
-    fetchTransactions();
+    loadTransactions();
   }, []);
 
   return (
@@ -92,27 +88,27 @@ const HomepageDashboard = () => {
             </div>
           </section>
         </div>
+
         <GovernmentPolicies />
-          {/* Cards Management Section */}
-          <section className="bg-white p-4 rounded-lg shadow-md flex-1">
-            <h2 className="text-2xl font-semibold mb-4">Cards</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <NavLink
-                to="/add-creditcard"
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-              >
-                Credit Card
-              </NavLink>
-              <NavLink
-                to="/add-debitcard"
-                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-              >
-                Debit Card
-              </NavLink>
-              
-            </div>
-          </section>
-          
+        
+        {/* Cards Management Section */}
+        <section className="bg-white p-4 rounded-lg shadow-md flex-1">
+          <h2 className="text-2xl font-semibold mb-4">Cards</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <NavLink
+              to="/add-creditcard"
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Credit Card
+            </NavLink>
+            <NavLink
+              to="/add-debitcard"
+              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+            >
+              Debit Card
+            </NavLink>
+          </div>
+        </section>
 
         {/* Transaction Details Section */}
         <section className="bg-white p-4 rounded-lg shadow-md mt-10">
@@ -128,13 +124,17 @@ const HomepageDashboard = () => {
                 <thead>
                   <tr className="bg-gray-200 border-b">
                     <th className="py-2 px-4 text-left">Transaction ID</th>
+                    <th className="py-2 px-4 text-left">From User</th>
+                    <th className="py-2 px-4 text-left">To User</th>
                     <th className="py-2 px-4 text-left">Amount (₹)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((transaction) => (
-                    <tr key={transaction.transactionId} className="border-b">
+                    <tr key={transaction._id} className="border-b">
                       <td className="py-2 px-4">{transaction._id}</td>
+                      <td className="py-2 px-4">{transaction.userOne}</td>
+                      <td className="py-2 px-4">{transaction.userTwo}</td>
                       <td className="py-2 px-4">₹{transaction.amount}</td>
                     </tr>
                   ))}

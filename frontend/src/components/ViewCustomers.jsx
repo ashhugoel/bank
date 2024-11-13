@@ -26,6 +26,11 @@ function ViewCustomers() {
     fetchCustomers();
   }, []);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
+  };
+
   if (loading) return <p className="text-center text-gray-600">Loading...</p>;
   if (error) return <p className="text-center text-red-600">Error: {error}</p>;
 
@@ -50,7 +55,7 @@ function ViewCustomers() {
                   <strong>Email:</strong> {customer.email}
                 </p>
                 <p className="text-gray-600 mb-1">
-                  <strong>DOB:</strong> {customer.DOB}
+                  <strong>DOB:</strong> {formatDate(customer.DOB)} {/* Format DOB */}
                 </p>
                 <p className="text-gray-600 mb-1">
                   <strong>Amount:</strong> ₹{customer.amount.toFixed(2)}

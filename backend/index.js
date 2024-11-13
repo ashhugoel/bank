@@ -4,15 +4,21 @@ require("dotenv").config();
 const cors = require("cors");
 const app = express();
 
-const policyRoutes = require("./routes/policies");
+// Log the MongoDB URL for debugging purposes
+console.log("MongoDB URL:", process.env.dbUrl);
 
-app.use("/api", policyRoutes);
+// CORS configuration
+const corsOptions = {
+  origin: "*", // Allow all origins temporarily for development
+};
+
+// Apply the CORS middleware globally before defining routes
+app.use(cors(corsOptions)); // This will allow CORS for all routes
+
+// MongoDB connection
 const PORT = process.env.PORT || 5000;
 mongoose
-  .connect(process.env.dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.dbUrl)
   .then(() => {
     console.log("Successfully connected to MongoDB");
   })
@@ -20,15 +26,17 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
-// app.get("/",(req,res) => {
-//     res.send("hi bruh")
-// })
-
+// Middleware to parse JSON
 app.use(express.json());
-app.use(cors());
+
+// API routes
+const policyRoutes = require("./routes/policies");
+app.use("/api", policyRoutes);
+
 const userRoute = require("./routes/userData");
 app.use("/api", userRoute);
 
+// Serve static files in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
   const path = require("path");
@@ -36,4 +44,6 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
-app.listen(PORT, () => console.log(`PORT is running at ${PORT}`));
+
+// Start the server
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

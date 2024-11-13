@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import SideBar from "./extracomponents/SideBar";
+import { addUser } from "../api"; // Import addUser function from api.js
 
 function AddCustomer() {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
+    Phone: "",
     DOB: "",
     gender: "",
     Address: "",
-    Phone: "",
     email: "",
+    employment: "",
     accountType: "",
     amount: "",
-    employment: "",
   });
 
   const handleChange = (e) =>
@@ -20,40 +21,39 @@ function AddCustomer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const [day, month, year] = form.DOB.split("-");
 
-    // Rearrange the parts into 'yyyy-mm-dd' format
-    const formattedDate = `${year}-${month}-${day}`;
+    // Ensure DOB is in the correct format and check its validity
+    const dobDate = new Date(form.DOB);
+    if (isNaN(dobDate.getTime())) {
+      alert("Invalid Date of Birth");
+      return; // Stop the form submission if DOB is invalid
+    }
 
-    // Ensure date is in yyyy-mm-dd format
     const formattedForm = {
-      ...form,
-      DOB: formattedDate, // Formats the date as yyyy-mm-dd
+      firstName: form.firstName,
+      lastName: form.lastName,
+      Phone: form.Phone,
+      DOB: form.DOB, // Use the date directly from the input field (already in yyyy-mm-dd format)
+      gender: form.gender,
+      Address: form.Address,
+      name: `${form.firstName} ${form.lastName}`, // Concatenate firstName and lastName to form name
+      email: form.email,
+      employment: form.employment,
+      accountType: form.accountType,
       amount: parseFloat(form.amount), // Ensure amount is a number
     };
 
     try {
       console.log("form", formattedForm);
-      const response = await fetch("/api/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formattedForm),
-      });
 
-      console.log(response);
+      // Call the addUser function to send data to the backend
+      const result = await addUser(formattedForm);
 
-      if (response.status == "201") {
-        alert("Customer added successfully");
-      } else {
-        throw new Error("Network response was not ok");
-      }
-
-      const result = await response.json();
       console.log("Customer added:", result);
+      alert("Customer added successfully"); // Show success message
     } catch (error) {
       console.error("Error adding customer:", error);
+      alert("Error adding customer"); // Show error message
     }
   };
 
@@ -182,8 +182,6 @@ function AddCustomer() {
                 required
               />
             </div>
-
-            
 
             <div>
               <label className="block text-gray-700 mb-2" htmlFor="accountType">

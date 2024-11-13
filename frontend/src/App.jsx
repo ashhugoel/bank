@@ -18,7 +18,7 @@ import AddCreditCard from "./components/AddCreditCard";
 function App() {
   return (
     <Router>
-      <div className="p-4">
+      <div >
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/update-customer" element={<UpdateCustomer />} />

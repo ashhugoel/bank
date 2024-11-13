@@ -45,7 +45,7 @@ const DeleteCustomer = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-10 min-h-[100vh] p-4">
+    <div className="flex flex-col lg:flex-row gap-10 min-h-[100vh] ">
       <SideBar />
       <div className="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-lg shadow-lg flex-1 flex flex-col justify-center">
         <h1 className="text-3xl font-semibold text-gray-800 mb-4 text-center">

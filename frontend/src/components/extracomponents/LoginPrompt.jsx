@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Homepage from "../Homepage";
 
-const correctUserID = "d"; // Replace with your actual user ID
+const correctUserID = "admin"; // Replace with your actual user ID
 
 const LoginPrompt = ({ onSuccess }) => {
   const [showPrompt, setShowPrompt] = useState(true);

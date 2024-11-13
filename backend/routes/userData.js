@@ -268,4 +268,38 @@ router.delete("/delete-transaction/:id", async function (req, res) {
   }
 });
 
+// Backend: Example of updating a transaction
+router.put('/update-transaction/:id', async (req, res) => {
+  const { id } = req.params;  // Get the transaction ID from the URL parameters
+  const { userOne, userTwo, amount } = req.body;  // Get the updated fields from the request body
+  console.log(req.body);
+  try {
+    // Check if required fields are present
+    if (!userOne || !userTwo || !amount) {
+      return res.status(400).json({ msg: "All fields (userOne, userTwo, amount) are required." });
+    }
+
+    // Find the transaction by ID and update it
+    const updatedTransaction = await transactions.findByIdAndUpdate(
+      id,  // Use the ID from the request parameters
+      { userOne, userTwo, amount },  // Update the provided fields
+      { new: true }  // This ensures the updated document is returned
+    );
+
+    // If the transaction is found and updated
+    if (updatedTransaction) {
+      res.status(200).json({
+        msg: "Transaction updated successfully.",
+        data: updatedTransaction,  // Send the updated transaction back to the client
+      });
+    } else {
+      return res.status(404).json({ msg: "Transaction not found." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: `Error: ${error.message}`,  // Send error message if something goes wrong
+    });
+  }
+});
 module.exports = router;

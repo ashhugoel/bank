@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SideBar from "./extracomponents/SideBar";
+import { fetchUserById, updateUser } from "../api"; // Import the appropriate API functions
 
 const UpdateCustomer = () => {
   const [form, setForm] = useState({
@@ -18,41 +19,36 @@ const UpdateCustomer = () => {
   const [accountNumber, setAccountNumber] = useState("");
   const [searchError, setSearchError] = useState("");
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
   };
 
+  // Handle form submission for updating the user
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: accountNumber, ...form }), // Spread form directly
-      });
-
-      if (response.status !== 200) {
-        throw new Error("Network response was not ok");
-      }
-
-      const result = await response.json();
+      // Use updateUser to send updated data to the backend
+      const updatedUser = await updateUser({ id: accountNumber, ...form });
       alert("User updated successfully!");
     } catch (error) {
       console.error("Error updating user:", error);
+      alert("Error updating user!");
     }
   };
 
+  // Fetch user details by account number
   const handleSearch = async () => {
     try {
-      const response = await fetch(`/api/customers/${accountNumber}`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const result = await response.json();
+      const result = await fetchUserById(accountNumber);
 
+      if (!result.data) {
+        setSearchError("User not found!");
+        return;
+      }
+
+      // Format DOB as 'yyyy-mm-dd'
       const dobFormatted = result.data.DOB
         ? new Date(result.data.DOB).toISOString().split("T")[0]
         : "";
@@ -61,7 +57,7 @@ const UpdateCustomer = () => {
         ...result.data,
         DOB: dobFormatted,
       });
-      setSearchError("");
+      setSearchError(""); // Clear any search errors
     } catch (error) {
       setSearchError("Error fetching user. Please check the account number.");
     }
@@ -71,7 +67,7 @@ const UpdateCustomer = () => {
     <div className="w-full flex flex-col lg:flex-row gap-10">
       <SideBar />
       <div className="flex-1 p-6 pt-0 overflow-auto">
-        <div className=" flex flex-col lg:flex-row h-screen bg-gray-100 p-4">
+        <div className="flex flex-col lg:flex-row h-screen bg-gray-100 p-4">
           <div className="flex-1 max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
             <h1 className="text-2xl font-bold mb-4">Update User</h1>
             <div className="flex items-center mb-4">
